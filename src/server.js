@@ -4,9 +4,13 @@ import express from 'express'
 
 import userRouter from './routers/userRouter.js'
 import productRouter from './routers/productRouter.js'
+import cors from 'cors'
 
 // cria o objeto app que tem todas as funções do express
 const app = express()
+
+//middleware para liberar o cors do frontend web
+app.use(cors()) 
 
 //middleware para o express entender json
 app.use(express.json()) //lê o json e grava objeto no req.body
