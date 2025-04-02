@@ -20,3 +20,11 @@ model user {
   pass      String    @db.VarChar(255)
   avatar    String?   @db.Text
 }
+
+model product {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
+  description String    @db.Text
+  price       Decimal   @db.Decimal(10, 2)
+  image       String    @db.Text
+}
