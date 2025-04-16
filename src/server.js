@@ -1,9 +1,12 @@
+// const express = require('express') <- Exemplo de importação com require
 // importacao do express
-// const express = require('express')
 import express from 'express'
 
+// importação dos routers
 import userRouter from './routers/userRouter.js'
 import productRouter from './routers/productRouter.js'
+
+// importação do cors
 import cors from 'cors'
 
 // cria o objeto app que tem todas as funções do express
