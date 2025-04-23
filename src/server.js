@@ -5,6 +5,7 @@ import express from 'express'
 // importação dos routers
 import userRouter from './routers/userRouter.js'
 import productRouter from './routers/productRouter.js'
+import { logger } from './middlewares/logger.js'
 
 // importação do cors
 import cors from 'cors'
@@ -13,10 +14,12 @@ import cors from 'cors'
 const app = express()
 
 //middleware para liberar o cors do frontend web
+app.use(logger)
 app.use(cors()) 
 
 //middleware para o express entender json
 app.use(express.json()) //lê o json e grava objeto no req.body
+
 
 // criando a rota get no endereço / (raiz: http://localhost:3000/) 
 app.get('/', (req, res) => {
