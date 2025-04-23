@@ -47,3 +47,13 @@
         - npm i @prisma/client // instala o Prisma Client
 
         - npx prisma generate // cria as funções do prisma client de acordo com o modelo (depois de instalar o @prisma/client)
+
+### Próximos Tópicos
+
+- Validação de dados com Zod
+- PAdrão de Projeto MIddleware
+- Criação do Middleware de Log
+- Criação do Handler de Erros (Trata exceções de erros)
+- 404 Not Found (Rota não encontrada)
+- Login e Logout
+- Autenticação e Autorização (Rotas protegidas)
