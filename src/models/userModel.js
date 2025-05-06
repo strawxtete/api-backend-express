@@ -1,61 +1,64 @@
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
+
 const prisma = new PrismaClient()
 
 const userSchema = z.object({
     id: z.number({
-        invalid_type_error: "O id deve ser um número!",
-        required_error: "O id é obrigatório!" }),
-    
+            invalid_type_error: "O id deve ser um valor numérico.",
+            required_error: "O id é obrigatório."
+        }),
     name: z.string({
-        invalid_type_error: "O nome deve ser uma string!",
-        required_error: "O nome é obrigatório!" 
-    })
-        .min(3, {message: "O nome deve ter no mínimo 3 caracteres!"})
-        .max(255, {message: "O nome deve ter no máximo 255 caracteres!"}),
-
+            invalid_type_error: "O nome deve ser uma string.",
+            required_error: "O nome é obrigatório."
+        })
+        .min(3, {message: "O nome deve ter no mínimo 3 caracteres."})
+        .max(255, {message: "O nome deve ter no máximo 255 caracteres."}),
     email: z.string({
-        invalid_type_error: "O e-mail deve ser uma string!",
-        required_error: "O e-mail é obrigatório!" 
-    })
-        .email({message: "O e-mail deve ser válido!"}),
-
+            invalid_type_error: "O email deve ser uma string.",
+            required_error: "O email é obrigatório."
+        })
+        .email({message: "Email inválido."}),
     pass: z.string({
-        invalid_type_error: "A senha deve ser uma string!",
-        required_error: "A senha é obrigatória!" 
-    })
-        .min(8, {message: "A senha deve ter no mínimo 8 caracteres!"})
-        .max(255, {message: "A senha deve ter no máximo 255 caracteres!"}),
-        
+        invalid_type_error: "A senha deve ser uma string.",
+        required_error: "A senha é obrigatória."
+        })
+        .min(8, {message: "A senha deve ter no mínimo 8 caracteres."})
+        .max(255, {message: "A senha deve ter no máximo 255 caracteres."}),
     avatar: z.string({
-        invalid_type_error: "A URL do avatar deve ser uma string!",
-        required_error: "A URL do avatar é obrigatória!" 
-    })
-        .url({message: "URL do avatar inválida!"})
+        invalid_type_error: "O avatar deve ser uma string.",
+        required_error: "O avatar é obrigatório."
+        })
+        .url({message: "Url do avatar inválida."})
         .optional()
 })
 
 export const userValidator = (user, partial = null) => {
     if (partial) {
-        return userSchema.partial().safeParse(user)
-    }
-
+        return userSchema.partial(partial).safeParse(user)
+    } 
     return userSchema.safeParse(user)
-}
+} 
 
 export async function create(user){
     const result = await prisma.user.create({
-        data: user
+        data: user,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true
+        }
     })
     return result
 }
 
-export async function list() {
+export async function list(){
     const result = await prisma.user.findMany({
         select: {
             id: true,
             name: true,
-            email: true, 
+            email: true,
             avatar: true
         }
     })
@@ -74,7 +77,15 @@ export async function getById(id){
             avatar: true
         }
     })
+    return result
+}
 
+export async function getByEmail(email){
+    const result = await prisma.user.findUnique({
+        where: {
+            email
+        }
+    })
     return result
 }
 
@@ -90,7 +101,6 @@ export async function remove(id){
             avatar: true
         }
     })
-
     return result
 }
 
@@ -100,7 +110,6 @@ export async function update(id, user){
             id: id
         },
         data: user,
-
         select: {
             id: true,
             name: true,
@@ -108,7 +117,6 @@ export async function update(id, user){
             avatar: true
         }
     })
-    
     return result
 }
 
@@ -127,6 +135,5 @@ export async function updateName(id, name){
             avatar: true
         }
     })
-    
     return result
 }

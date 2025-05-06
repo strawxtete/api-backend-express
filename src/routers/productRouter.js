@@ -1,18 +1,36 @@
 import express from 'express'
-import listProductController from '../controllers/product/listProductController.js'
-import getProductController from '../controllers/product/getProductController.js'
-import createProductController from '../controllers/product/createProductController.js'
-import updateProductController from '../controllers/product/updateProductController.js'
-import deleteProductController from '../controllers/product/deleteProductController.js'
-import editNameProductController from '../controllers/product/editNameProductController.js'
 
 const router = express.Router()
 
-router.get('/list', listProductController)
-router.get('/:id', getProductController)
-router.post('/', createProductController)
-router.put('/:id', updateProductController)
-router.delete('/:id', deleteProductController)
-router.patch('/name/:id', editNameProductController)
+router.get('/', (req, res) => {
+    return res.json({
+        message: "Resposta do Router GET /product/"
+    })
+})
+
+router.post('/', (req, res) => {
+    return res.json({
+        message: "Resposta do Router POST /product/"
+    })
+})
+
+router.put('/', (req, res) => {
+    return res.json({
+        message: "Resposta do Router PUT /product/"
+    })
+})
+
+router.delete('/', (req, res) => {
+    return res.json({
+        message: "Resposta do Router DELETE /product/"
+    })
+})
+
+router.patch('/', (req, res) => {
+    return res.json({
+        message: "Resposta do Router PATCH /product/"
+    })
+})
+
 
 export default router
