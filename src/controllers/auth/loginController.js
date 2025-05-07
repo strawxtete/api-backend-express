@@ -1,57 +1,61 @@
 import { userValidator, getByEmail } from "../../models/userModel.js"
-import bcrypt from "bcrypt"
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
-export default async function (req, res, next){
+export default async function loginController(req, res, next){
     try{
-        //recebe os dados do usuário para ser cadastrado
         const user = req.body
-        // valida os dados
         const { success, error, data } = userValidator(user, {id: true, name: true, avatar: true})
 
-        // se os dados não forem válidos, retorna erro 400
-        // e os erros encontrados
         if(!success){
             return res.status(400).json({
-                message: "Erro ao validar os dados do usuário!",
+                message: "Erro ao validar os dados do login!",
                 errors: error.flatten().fieldErrors
             })
         }
 
-        data.pass = bcrypt.hashSync(data.pass, 10)
-
-        // se os dados forem válidos, chama a função create do model
+        // busca o usuário no banco de dados pelo email
         const result = await getByEmail(data.email)
 
-        // se o uuário não for encontrado, retorna erro 400
+        // Se o usuário não for encontrado pelo email, retorna um erro
         if(!result){
             return res.status(400).json({
-                message: "Usuário ou senha inválidos! (Usuário não encontrado)",
+                message: "Usuário ou senha inválidos! (Usuario não encontrado)",
             })
         }
 
-        const passisValid = bcrypt.compareSync(data.pass, result.pass)
+        // verifica se a senha do login confere com o hash da senha do banco de dados
+        const passIsValid = bcrypt.compareSync(data.pass, result.pass)
 
-        if(!result){
+        // se a senha não confere, retorna um erro
+        if(!passIsValid){
             return res.status(400).json({
-                message: "Usuário ou senha inválidos! (Senha inválida)",
+                message: "Usuário ou senha inválidos! (Senha não confere)",
             })
         }
+
+        // dados para guardar no token (payload)
+        const payload = {
+            id: result.id,
+        }
+
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' })
+        const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3d' })
         
-        // se a criação do usuário for bem sucedida, retorna o usuário criado
-        return res.status(201).json({
-            message: "Usuário criado com sucesso!",
-            user: result
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 3 * 24 * 60 * 60 * 1000 }) // 3 dias
+
+        return res.status(200).json({
+            message: "Login realizado com sucesso!",
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            user: {
+                id: result.id,
+                name: result.name,
+                email: result.email,
+                avatar: result.avatar
+            }
         })
     } catch(error){
-        if(error?.code === "P2002" && error?.meta?.target === "user_email_key"){
-            return res.status(400).json({
-                message: "Erro ao criar usuário!",
-                errors: {
-                    email: ["Email já cadastrado!"]
-                }
-            })
-        }
-
         next(error)
     }
 }
